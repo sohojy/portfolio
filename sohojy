@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>조호석 • Artist and Photographer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #000;
+            background: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: #fff;
+            border-bottom: 1px solid #000;
+            padding: 15px 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 16px;
+            font-weight: normal;
+            color: #000;
+            text-decoration: none;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #000;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #fff;
+            z-index: 2000;
+            display: none;
+            padding: 60px 20px 20px;
+        }
+
+        .nav-menu.active {
+            display: block;
+        }
+
+        .nav-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            list-style: none;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-links li {
+            margin-bottom: 20px;
+        }
+
+        .nav-links a {
+            color: #000;
+            text-decoration: none;
+            font-size: 16px;
+            display: block;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            transition: opacity 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.6;
+        }
+
+        /* Main Content */
+        main {
+            margin-top: 60px;
+            padding: 40px 20px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero h1 {
+            font-size: 24px;
+            font-weight: normal;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Gallery Grid */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .gallery-item {
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .gallery-item:hover {
+            opacity: 0.8;
+        }
+
+        .gallery-image {
+            width: 100%;
+            aspect-ratio: 4/5;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .gallery-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-info h3 {
+            font-size: 14px;
+            font-weight: normal;
+            margin-bottom: 5px;
+        }
+
+        .gallery-info p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Section Styles */
+        .section {
+            margin-bottom: 80px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: normal;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        /* About Section */
+        .about-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .about-content p {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        /* Contact Section */
+        .contact-content {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .contact-content p {
+            margin-bottom: 15px;
+        }
+
+        .contact-content a {
+            color: #000;
+            text-decoration: underline;
+        }
+
+        .contact-content a:hover {
+            opacity: 0.6;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+            text-align: center;
+        }
+
+        .modal-image {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            margin-bottom: 20px;
+        }
+
+        .modal-info {
+            font-size: 14px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #000;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid #eee;
+            padding: 40px 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .hero h1 {
+                font-size: 20px;
+            }
+
+            main {
+                padding: 20px 15px;
+            }
+
+            header {
+                padding: 15px;
+            }
+        }
+
+        /* Hide sections initially */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Show home by default */
+        .content-section#home {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="#" class="logo" onclick="showSection('home')">조호석</a>
+            <button class="menu-toggle" onclick="toggleMenu()">Menu</button>
+        </div>
+    </header>
+
+    <div class="nav-menu" id="navMenu">
+        <button class="nav-close" onclick="toggleMenu()">✕</button>
+        <ul class="nav-links">
+            <li><a href="#" onclick="showSection('home'); toggleMenu();">Home</a></li>
+            <li><a href="#" onclick="showSection('artwork'); toggleMenu();">Artwork</a></li>
+            <li><a href="#" onclick="showSection('editorial'); toggleMenu();">Editorial</a></li>
+            <li><a href="#" onclick="showSection('commercial'); toggleMenu();">Commercial</a></li>
+            <li><a href="#" onclick="showSection('about'); toggleMenu();">About</a></li>
+            <li><a href="#" onclick="showSection('contact'); toggleMenu();">Contact</a></li>
+        </ul>
+    </div>
+
+    <main>
+        <div class="container">
+            <!-- Home Section -->
+            <div class="content-section active" id="home">
+                <div class="hero">
+                    <h1>조호석</h1>
+                    <p>Artist and Photographer</p>
+                </div>
+
+                <div class="gallery">
+                    <div class="gallery-item" onclick="openModal('작품 1', '순간의 아름다움을 포착한 인물 사진')">
+                        <div class="gallery-image">PORTRAIT 01</div>
+                        <div class="gallery-info">
+                            <h3>순간의 아름다움</h3>
+                            <p>2024, Portrait</p>
+                        </div>
+                    </div>
+
+                    <div class="gallery-item" onclick="openModal('작품 2', '자연스러운 감정을 담은 웨딩 사진')">
+                        <div class="gallery-image">WEDDING 01</div>
+                        <div class="gallery-info">
+                            <h3>영원한 순간</h3>
+                            <p>2024, Wedding</p>
+                        </div>
+                    </div>
+
+                    <div class="gallery-item" onclick="openModal('작품 3', '브랜드의 가치를 표현한 상업 사진')">
+                        <div class="gallery-image">COMMERCIAL 01</div>
+                        <div class="gallery-info">
+                            <h3>브랜드 스토리</h3>
+                            <p>2024, Commercial</p>
+                        </div>
+                    </div>
+
+                    <div class="gallery-item" onclick="openModal('작품 4', '도시의 밤을 담은 스트리트 포토그래피')">
+                        <div class="gallery-image">STREET 01</div>
+                        <div class="gallery-info">
+                            <h3>도시의 밤</h3>
+                            <p>2024, Street</p>
+                        </div>
+                    </div>
+
+                    <div class="gallery-item" onclick="openModal('작품 5', '자연의 경이로움을 표현한 풍경 사진')">
+                        <div class="gallery-image">LANDSCAPE 01</div>
+                        <div class="gallery-info">
+                            <h3>자연의 경이</h3>
+                            <p>2024, Landscape</p>
+                        </div>
+                    </div>
+
+                    <div class="gallery-item" onclick="openModal('작품 6', '패션의 예술성을 담은 작품')">
+                        <div class="gallery-image">FASHION 01</div>
+                        <div class="gallery-info">
+                            <h3>패션의 예술</h3>
+                            <p>2024, Fashion</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Artwork Section -->
+            <div class="content-section" id="artwork">
+                <div class="section">
+                    <h2 class="section-title">Artwork</h2>
+                    <div class="gallery">
+                        <div class="gallery-item" onclick="openModal('개인 작품 1', '개인적인 예술 프로젝트')">
+                            <div class="gallery-image">ARTWORK 01</div>
+                            <div class="gallery-info">
+                                <h3>내면의 소리</h3>
+                                <p>2024, Personal Work</p>
+                            </div>
+                        </div>
+                        <div class="gallery-item" onclick="openModal('개인 작품 2', '실험적인 사진 기법을 활용한 작품')">
+                            <div class="gallery-image">ARTWORK 02</div>
+                            <div class="gallery-info">
+                                <h3>실험과 도전</h3>
+                                <p>2024, Experimental</p>
+                            </div>
+                        </div>
+                        <div class="gallery-item" onclick="openModal('개인 작품 3', '시간의 흐름을 표현한 연작')">
+                            <div class="gallery-image">ARTWORK 03</div>
+                            <div class="gallery-info">
+                                <h3>시간의 흔적</h3>
+                                <p>2024, Series</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Editorial Section -->
+            <div class="content-section" id="editorial">
+                <div class="section">
+                    <h2 class="section-title">Editorial</h2>
+                    <div class="gallery">
+                        <div class="gallery-item" onclick="openModal('에디토리얼 1', '패션 매거진 촬영')">
+                            <div class="gallery-image">EDITORIAL 01</div>
+                            <div class="gallery-info">
+                                <h3>Vogue Korea</h3>
+                                <p>2024, Fashion Editorial</p>
+                            </div>
+                        </div>
+                        <div class="gallery-item" onclick="openModal('에디토리얼 2', '라이프스타일 매거진 프로젝트')">
+                            <div class="gallery-image">EDITORIAL 02</div>
+                            <div class="gallery-info">
+                                <h3>Elle Korea</h3>
+                                <p>2024, Lifestyle</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Commercial Section -->
+            <div class="content-section" id="commercial">
+                <div class="section">
+                    <h2 class="section-title">Commercial</h2>
+                    <div class="gallery">
+                        <div class="gallery-item" onclick="openModal('상업 작품 1', '브랜드 캠페인 촬영')">
+                            <div class="gallery-image">COMMERCIAL 01</div>
+                            <div class="gallery-info">
+                                <h3>Samsung Campaign</h3>
+                                <p>2024, Brand Campaign</p>
+                            </div>
+                        </div>
+                        <div class="gallery-item" onclick="openModal('상업 작품 2', '제품 사진 촬영')">
+                            <div class="gallery-image">COMMERCIAL 02</div>
+                            <div class="gallery-info">
+                                <h3>Beauty Products</h3>
+                                <p>2024, Product Photography</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="content-section" id="about">
+                <div class="section">
+                    <h2 class="section-title">About</h2>
+                    <div class="about-content">
+                        <p>조호석은 서울을 기반으로 활동하는 사진가이자 아티스트입니다.</p>
+                        <p>7년간 다양한 장르의 사진 작업을 통해 인간의 감정과 순간의 아름다움을 포착하는 일에 전념해왔습니다. 자연스러운 스토리텔링과 진정성 있는 감정 표현을 가장 중요하게 생각합니다.</p>
+                        <p>인물 사진부터 상업 사진, 에디토리얼 작업까지 폭넓은 영역에서 활동하며, 각각의 프로젝트마다 고유한 시각과 감성을 담아내려 노력합니다.</p>
+                        <p>현재 서울과 뉴욕을 오가며 다양한 클라이언트들과 작업하고 있습니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="content-section" id="contact">
+                <div class="section">
+                    <h2 class="section-title">Contact</h2>
+                    <div class="contact-content">
+                        <p>새로운 프로젝트나 협업에 관심이 있으시면 언제든 연락 주세요.</p>
+                        <p><a href="mailto:johoseok@photographer.com">johoseok@photographer.com</a></p>
+                        <p><a href="tel:+82-10-1234-5678">+82 10-1234-5678</a></p>
+                        <p>Seoul, Korea</p>
+                        <br>
+                        <p><a href="https://instagram.com/johoseok" target="_blank">Instagram</a></p>
+                        <p><a href="https://behance.net/johoseok" target="_blank">Behance</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 조호석. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="modal-content">
+            <div class="modal-image" id="modalImage">IMAGE PLACEHOLDER</div>
+            <div class="modal-info">
+                <h3 id="modalTitle"></h3>
+                <p id="modalDescription"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('active');
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+        }
+
+        function openModal(title, description) {
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDescription = document.getElementById('modalDescription');
+            
+            modalTitle.textContent = title;
+            modalDescription.textContent = description;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('navMenu');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (!menu.contains(event.target) && !menuToggle.contains(event.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
