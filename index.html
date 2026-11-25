@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JO HOSEOK — Photographer</title>
+<meta name="description" content="조호석 — Artist and Photographer, Seoul">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --fg: #e8e8e3;
+    --dim: #7a7a75;
+    --line: #2a2a28;
+    --accent: #ff4d00;
+    --ph: #161615;
+    --mono: 'IBM Plex Mono', 'IBM Plex Sans KR', ui-monospace, monospace;
+  }
+  :root[data-theme="light"] {
+    --bg: #ecebe6;
+    --fg: #111;
+    --dim: #6b6b66;
+    --line: #c9c8c2;
+    --ph: #dcdbd5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-transform: inherit; letter-spacing: inherit; }
+  .dim { color: var(--dim); }
+  .acc { color: var(--accent); }
+  .ko { text-transform: none; font-family: 'IBM Plex Sans KR', var(--mono); }
+
+  /* ---------- top bar ---------- */
+  .bar {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 10px 16px;
+    gap: 12px;
+  }
+  .bar .id { font-weight: 500; }
+  .bar nav { display: flex; gap: 18px; }
+  .bar nav a { color: var(--dim); }
+  .bar nav a:hover, .bar nav a.on { color: var(--fg); }
+  .bar nav a.on::before { content: '▪ '; color: var(--accent); }
+  .bar .meta { justify-self: end; display: flex; gap: 16px; color: var(--dim); }
+  .bar .meta button:hover { color: var(--fg); }
+
+  .status {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px;
+    padding: 6px 16px;
+    border-bottom: 1px solid var(--line);
+    color: var(--dim);
+    font-size: 11px;
+  }
+  .blink { animation: blink 1.2s steps(2) infinite; color: var(--accent); }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  main { min-height: calc(100vh - 140px); }
+  .view { display: none; }
+  .view.on { display: block; }
+
+  /* ---------- index controls ---------- */
+  .controls {
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px 16px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .filters, .modes { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  .filters button, .modes button { color: var(--dim); }
+  .filters button:hover, .modes button:hover { color: var(--fg); }
+  .filters button.on, .modes button.on { color: var(--fg); }
+  .filters button.on::before, .modes button.on::before { content: '['; }
+  .filters button.on::after, .modes button.on::after { content: ']'; }
+  .filters sup { font-size: 9px; color: var(--dim); margin-left: 2px; }
+
+  /* ---------- grid ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-left: 1px solid var(--line);
+  }
+  .cell {
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 10px;
+    display: flex; flex-direction: column; gap: 10px;
+    cursor: pointer;
+    position: relative;
+  }
+  .cell .top, .cell .bot { display: flex; justify-content: space-between; gap: 8px; }
+  .cell .bot { color: var(--dim); }
+  .cell:hover .code { color: var(--accent); }
+  .cell:hover .frame img { filter: none; }
+  .frame {
+    aspect-ratio: 4 / 5;
+    background: var(--ph);
+    overflow: hidden;
+    position: relative;
+    display: grid; place-items: center;
+  }
+  .frame img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    filter: grayscale(0.35);
+    transition: filter .25s;
+  }
+  .ph {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    color: var(--dim); font-size: 10px;
+    background:
+      linear-gradient(to top right, transparent calc(50% - .5px), var(--line) 50%, transparent calc(50% + .5px)),
+      linear-gradient(to top left, transparent calc(50% - .5px), var(--line) 50%, transparent calc(50% + .5px));
+  }
+  .ph span { background: var(--ph); padding: 2px 6px; }
+
+  /* ---------- list ---------- */
+  table.list { width: 100%; border-collapse: collapse; }
+  .list th, .list td {
+    text-align: left; font-weight: 400;
+    padding: 9px 16px;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  .list th { color: var(--dim); font-size: 11px; }
+  .list tbody tr { cursor: pointer; }
+  .list tbody tr:hover { background: var(--fg); color: var(--bg); }
+  .list tbody tr:hover .dim { color: var(--bg); opacity: .6; }
+  .list td.t { white-space: normal; width: 40%; }
+
+  /* ---------- detail ---------- */
+  .detail { display: grid; grid-template-columns: 360px 1fr; min-height: calc(100vh - 140px); }
+  .spec {
+    border-right: 1px solid var(--line);
+    padding: 16px;
+    position: sticky; top: 42px; align-self: start;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .spec .back { color: var(--dim); }
+  .spec .back:hover { color: var(--fg); }
+  .spec h1 { font-size: 22px; font-weight: 500; line-height: 1.15; letter-spacing: 0; }
+  .spec .sub { margin-top: 4px; }
+  .spec dl { display: grid; grid-template-columns: 110px 1fr; border-top: 1px solid var(--line); }
+  .spec dt, .spec dd { padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .spec dt { color: var(--dim); }
+  .spec .note { font-size: 13px; line-height: 1.7; letter-spacing: 0; }
+  .spec .pager { display: flex; justify-content: space-between; color: var(--dim); }
+  .spec .pager button:hover { color: var(--fg); }
+  .plates { display: flex; flex-direction: column; }
+  .plate { border-bottom: 1px solid var(--line); padding: 16px; }
+  .plate .frame { aspect-ratio: 3 / 2; }
+  .plate .frame img { filter: none; object-fit: contain; }
+  .plate .cap { display: flex; justify-content: space-between; color: var(--dim); margin-top: 8px; }
+
+  /* ---------- info ---------- */
+  .info { display: grid; grid-template-columns: 1fr 1fr; }
+  .info section { padding: 16px; border-bottom: 1px solid var(--line); }
+  .info section:nth-child(odd) { border-right: 1px solid var(--line); }
+  .info h2 { font-size: 11px; font-weight: 400; color: var(--dim); margin-bottom: 14px; }
+  .info .bio { font-size: 14px; line-height: 1.8; letter-spacing: 0; max-width: 46ch; }
+  .info .bio p + p { margin-top: 1em; }
+  .rows div { display: grid; grid-template-columns: 70px 1fr; padding: 7px 0; border-bottom: 1px solid var(--line); gap: 12px; }
+  .rows div:first-child { border-top: 1px solid var(--line); }
+  .rows a:hover { color: var(--accent); }
+
+  footer {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--line);
+    color: var(--dim); font-size: 11px;
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 1100px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 800px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    .detail { grid-template-columns: 1fr; }
+    .spec { position: static; border-right: 0; border-bottom: 1px solid var(--line); }
+    .info { grid-template-columns: 1fr; }
+    .info section:nth-child(odd) { border-right: 0; }
+    .list .hide-m { display: none; }
+  }
+  @media (max-width: 560px) {
+    .bar { grid-template-columns: 1fr auto; }
+    .bar nav { grid-column: 1 / -1; grid-row: 2; }
+    .cell { padding: 8px; }
+    .cell .bot span:last-child { display: none; }
+    .list th, .list td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <a class="id" href="#/">JO HOSEOK <span class="dim">/ 조호석</span></a>
+  <nav>
+    <a href="#/" data-nav="index">Index</a>
+    <a href="#/info" data-nav="info">Info</a>
+  </nav>
+  <div class="meta">
+    <button id="theme" title="Toggle theme">◐</button>
+  </div>
+</header>
+<div class="status">
+  <span>Artist / Photographer — Seoul, KR</span>
+  <span>37.5665°N 126.9780°E</span>
+  <span><span class="blink">●</span> KST <span id="clock">--:--:--</span></span>
+</div>
+
+<main>
+  <!-- INDEX -->
+  <div class="view" id="v-index">
+    <div class="controls">
+      <div class="filters" id="filters"></div>
+      <div class="modes">
+        <button data-mode="grid" class="on">Grid</button>
+        <button data-mode="list">List</button>
+      </div>
+    </div>
+    <div id="out"></div>
+  </div>
+
+  <!-- DETAIL -->
+  <div class="view" id="v-detail"></div>
+
+  <!-- INFO -->
+  <div class="view" id="v-info">
+    <div class="info">
+      <section>
+        <h2>01 — Profile</h2>
+        <div class="bio ko">
+          <p>조호석은 서울을 기반으로 활동하는 사진가이자 아티스트입니다.</p>
+          <p>인물, 에디토리얼, 커머셜 작업을 오가며 사람과 순간이 가진 고유한 결을 기록합니다.</p>
+        </div>
+      </section>
+      <section>
+        <h2>02 — Contact</h2>
+        <div class="rows">
+          <div><span class="dim">Mail</span><a href="mailto:hello@example.com">hello@example.com</a></div>
+          <div><span class="dim">IG</span><a href="https://instagram.com/" target="_blank" rel="noopener">@instagram ↗</a></div>
+          <div><span class="dim">Base</span><span>Seoul, KR</span></div>
+        </div>
+      </section>
+      <section>
+        <h2>03 — Selected Clients</h2>
+        <div class="rows" id="clients"></div>
+      </section>
+      <section>
+        <h2>04 — Services</h2>
+        <div class="rows">
+          <div><span class="dim">S-01</span><span>Portrait</span></div>
+          <div><span class="dim">S-02</span><span>Editorial</span></div>
+          <div><span class="dim">S-03</span><span>Commercial / Campaign</span></div>
+          <div><span class="dim">S-04</span><span>Personal Work</span></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>© <span id="yr"></span> Jo Hoseok. All rights reserved.</span>
+  <span id="count"></span>
+</footer>
+
+<script>
+/* =====================================================================
+   작품 데이터 — 여기만 고치면 사이트 전체가 바뀝니다.
+   - code     : 작품 번호 (예: ED-001)
+   - cat      : 카테고리 (Artwork / Editorial / Commercial / Portrait ...)
+   - images   : images/ 폴더에 넣은 파일 경로. 비워두면 자리표시 박스가 나옵니다.
+   - client   : 없으면 '—'
+   ===================================================================== */
+const WORKS = [
+  { code: 'AR-001', title: 'Untitled (Interior)', cat: 'Artwork',    year: 2026, client: '—',          location: 'Seoul',  camera: 'Medium format', note: '작품 설명을 여기에 적어주세요.', images: [] },
+  { code: 'ED-001', title: 'Editorial Story 01',   cat: 'Editorial',  year: 2026, client: 'Magazine',   location: 'Seoul',  camera: '35mm',          note: '매거진 / 화보 설명.', images: [] },
+  { code: 'CM-001', title: 'Campaign 01',          cat: 'Commercial', year: 2026, client: 'Brand',      location: 'Studio', camera: 'Digital',       note: '캠페인 설명.', images: [] },
+  { code: 'PT-001', title: 'Portrait Series 01',   cat: 'Portrait',   year: 2025, client: '—',          location: 'Seoul',  camera: '35mm',          note: '인물 시리즈 설명.', images: [] },
+  { code: 'AR-002', title: 'Untitled (Night)',     cat: 'Artwork',    year: 2025, client: '—',          location: 'Busan',  camera: '35mm',          note: '', images: [] },
+  { code: 'ED-002', title: 'Editorial Story 02',   cat: 'Editorial',  year: 2025, client: 'Magazine',   location: 'Tokyo',  camera: 'Digital',       note: '', images: [] },
+  { code: 'CM-002', title: 'Lookbook 01',          cat: 'Commercial', year: 2025, client: 'Label',      location: 'Studio', camera: 'Digital',       note: '', images: [] },
+  { code: 'PT-002', title: 'Portrait Series 02',   cat: 'Portrait',   year: 2024, client: '—',          location: 'Seoul',  camera: 'Medium format', note: '', images: [] },
+];
+
+/* ===================================================================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let cat = 'All', mode = 'grid';
+
+function frame(src, label) {
+  return `<div class="frame">${src
+    ? `<img src="${esc(src)}" alt="${esc(label)}" loading="lazy">`
+    : `<div class="ph"><span>${esc(label)} / NO IMAGE</span></div>`}</div>`;
+}
+
+function renderFilters() {
+  const cats = ['All', ...new Set(WORKS.map(w => w.cat))];
+  $('#filters').innerHTML = cats.map(c => {
+    const n = c === 'All' ? WORKS.length : WORKS.filter(w => w.cat === c).length;
+    return `<button data-cat="${esc(c)}" class="${c === cat ? 'on' : ''}">${esc(c)}<sup>${String(n).padStart(2,'0')}</sup></button>`;
+  }).join('');
+}
+
+function renderIndex() {
+  const list = WORKS.filter(w => cat === 'All' || w.cat === cat);
+  if (mode === 'grid') {
+    $('#out').innerHTML = `<div class="grid">${list.map(w => `
+      <a class="cell" href="#/work/${esc(w.code)}">
+        <div class="top"><span class="code">${esc(w.code)}</span><span class="dim">${w.year}</span></div>
+        ${frame(w.images[0], w.code)}
+        <div class="bot"><span>${esc(w.title)}</span><span>${esc(w.cat)}</span></div>
+      </a>`).join('')}</div>`;
+  } else {
+    $('#out').innerHTML = `<table class="list">
+      <thead><tr><th>No.</th><th>Code</th><th>Title</th><th class="hide-m">Category</th><th class="hide-m">Client</th><th>Year</th></tr></thead>
+      <tbody>${list.map((w, i) => `
+        <tr onclick="location.hash='#/work/${esc(w.code)}'">
+          <td class="dim">${String(i+1).padStart(3,'0')}</td>
+          <td>${esc(w.code)}</td>
+          <td class="t">${esc(w.title)}</td>
+          <td class="hide-m">${esc(w.cat)}</td>
+          <td class="hide-m dim">${esc(w.client)}</td>
+          <td>${w.year}</td>
+        </tr>`).join('')}</tbody></table>`;
+  }
+  $('#count').textContent = `${String(list.length).padStart(3,'0')} / ${String(WORKS.length).padStart(3,'0')} entries`;
+}
+
+function renderDetail(code) {
+  const i = WORKS.findIndex(w => w.code === code);
+  if (i < 0) return route('#/');
+  const w = WORKS[i];
+  const prev = WORKS[(i - 1 + WORKS.length) % WORKS.length];
+  const next = WORKS[(i + 1) % WORKS.length];
+  const imgs = w.images.length ? w.images : [null, null];
+  $('#v-detail').innerHTML = `<div class="detail">
+    <aside class="spec">
+      <a class="back" href="#/">← Index</a>
+      <div>
+        <div class="acc">${esc(w.code)}</div>
+        <h1>${esc(w.title)}</h1>
+        <div class="sub dim">${esc(w.cat)} — ${w.year}</div>
+      </div>
+      <dl>
+        <dt>Code</dt><dd>${esc(w.code)}</dd>
+        <dt>Category</dt><dd>${esc(w.cat)}</dd>
+        <dt>Client</dt><dd>${esc(w.client)}</dd>
+        <dt>Location</dt><dd>${esc(w.location)}</dd>
+        <dt>Format</dt><dd>${esc(w.camera)}</dd>
+        <dt>Year</dt><dd>${w.year}</dd>
+        <dt>Plates</dt><dd>${String(imgs.length).padStart(2,'0')}</dd>
+      </dl>
+      ${w.note ? `<p class="note ko">${esc(w.note)}</p>` : ''}
+      <div class="pager">
+        <a href="#/work/${esc(prev.code)}">← ${esc(prev.code)}</a>
+        <a href="#/work/${esc(next.code)}">${esc(next.code)} →</a>
+      </div>
+    </aside>
+    <div class="plates">${imgs.map((src, k) => `
+      <div class="plate">
+        ${frame(src, `${w.code}-${String(k+1).padStart(2,'0')}`)}
+        <div class="cap"><span>Plate ${String(k+1).padStart(2,'0')}</span><span>${esc(w.code)}</span></div>
+      </div>`).join('')}</div>
+  </div>`;
+  $('#count').textContent = `${String(i+1).padStart(3,'0')} / ${String(WORKS.length).padStart(3,'0')}`;
+  window.scrollTo(0, 0);
+}
+
+function renderClients() {
+  const cs = [...new Set(WORKS.map(w => w.client).filter(c => c && c !== '—'))];
+  $('#clients').innerHTML = cs.map((c, i) => `<div><span class="dim">C-${String(i+1).padStart(2,'0')}</span><span>${esc(c)}</span></div>`).join('');
+}
+
+function route(h) {
+  if (h) { location.hash = h; return; }
+  const hash = location.hash || '#/';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+  document.querySelectorAll('[data-nav]').forEach(a => a.classList.remove('on'));
+  const m = hash.match(/^#\/work\/(.+)$/);
+  if (m) { $('#v-detail').classList.add('on'); renderDetail(decodeURIComponent(m[1])); }
+  else if (hash === '#/info') { $('#v-info').classList.add('on'); $('[data-nav=info]').classList.add('on'); $('#count').textContent = ''; }
+  else { $('#v-index').classList.add('on'); $('[data-nav=index]').classList.add('on'); renderIndex(); }
+}
+
+$('#filters').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  cat = b.dataset.cat; renderFilters(); renderIndex();
+});
+document.querySelector('.modes').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  mode = b.dataset.mode;
+  document.querySelectorAll('.modes button').forEach(x => x.classList.toggle('on', x === b));
+  renderIndex();
+});
+document.addEventListener('keydown', e => {
+  if (!$('#v-detail').classList.contains('on')) return;
+  if (e.key === 'Escape') route('#/');
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    const a = document.querySelectorAll('.pager a')[e.key === 'ArrowLeft' ? 0 : 1];
+    if (a) location.hash = a.getAttribute('href');
+  }
+});
+
+// theme
+try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch (_) {}
+$('#theme').addEventListener('click', () => {
+  const r = document.documentElement;
+  r.dataset.theme = r.dataset.theme === 'light' ? 'dark' : 'light';
+  try { localStorage.setItem('theme', r.dataset.theme); } catch (_) {}
+});
+
+// clock
+function tick() {
+  $('#clock').textContent = new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Seoul', hour12: false });
+}
+tick(); setInterval(tick, 1000);
+$('#yr').textContent = new Date().getFullYear();
+
+window.addEventListener('hashchange', () => route());
+renderFilters(); renderClients(); route();
+</script>
+</body>
+</html>
